@@ -29,7 +29,3 @@ jobs:
           name: ike_taunt
           path: target/aarch64-skyline-switch/release/*.nro
           if-no-files-found: error
-
-[profile.release]
-panic = "abort"
-lto = true
