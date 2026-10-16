@@ -1,26 +1,34 @@
-[package]
-name = "ike_taunt"
-version = "0.1.0"
-authors = []
-edition = "2021"
+name: Build plugin
 
-[package.metadata.skyline]
-titleid = "01006A800016E000"
+on:
+  push:
+  workflow_dispatch:
 
-[lib]
-crate-type = ["cdylib"]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
 
-[dependencies]
-skyline = { git = "https://github.com/ultimate-research/skyline-rs.git" }
-skyline_smash = { git = "https://github.com/ultimate-research/skyline-smash.git" }
-smash_script = { git = "https://github.com/blu-dev/smash-script.git", branch = "development" }
-smashline = { git = "https://github.com/HDR-Development/smashline.git", rev = "df194a03b918116adb7bda1c2b4565dcd82a4756" }
+      - name: Install Rust
+        run: rustup toolchain install stable --profile minimal
 
-[patch.crates-io]
-nnsdk = { git = "https://github.com/ultimate-research/nnsdk-rs.git" }
+      - name: Install cargo-skyline
+        run: cargo install cargo-skyline --locked
 
-[profile.dev]
-panic = "abort"
+      - name: Download the Skyline toolchain
+        run: cargo skyline update-std
+
+      - name: Build the plugin
+        run: cargo skyline build --release
+
+      - name: Upload the .nro
+        uses: actions/upload-artifact@v4
+        with:
+          name: ike_taunt
+          path: target/aarch64-skyline-switch/release/*.nro
+          if-no-files-found: error
 
 [profile.release]
 panic = "abort"
